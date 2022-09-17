@@ -27,7 +27,6 @@ void robotImg::drawrobotImg(QPainter *painter){
     painter->rotate(rad2deg(-m_currRobotPose.theta));
     painter->drawPixmap(QPoint(-m_robotImg.width()/2, -m_robotImg.height()/2), m_robotImg);
     painter->restore();
-
 }
 
 void robotImg::updaterobotPose(robotPose robotpose){

@@ -23,6 +23,8 @@ void RobotItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 //    drawglobalMaps(painter);
 
     drawlaserScan(painter);
+    drawglobalPath(painter);
+    drawlocalPath(painter);
 }
 
 QRectF RobotItem::boundingRect() const
@@ -30,10 +32,21 @@ QRectF RobotItem::boundingRect() const
     return QRectF(0, 0, 400, 400);
 }
 
+void RobotItem::drawlocalPath(QPainter *painter){
+    painter->setPen(QPen(QColor(0, 255, 0), 1));
+    painter->drawPoints(m_localpathpoints);
+}
+
+void RobotItem::drawglobalPath(QPainter *painter){
+    painter->setPen(QPen(QColor(255, 0, 0), 1));
+    painter->drawPoints(m_globalpathpoints);
+}
+
 void RobotItem::drawlaserScan(QPainter *painter){
     painter->setPen(QPen(m_lasercolor, 2));
     painter->drawPoints(m_laserscanpoints);
 }
+
 void RobotItem::drawrobotPose(QPainter *painter){
 //    painter->setPen(QPen(QColor(0, 0, 255), 10));
     painter->save();
@@ -92,6 +105,16 @@ void RobotItem::drawLines(QPainter *painter)
 {
     painter->setPen(QPen(QColor(255, 0, 0), 1));
     painter->drawLine(m_line);
+}
+
+void RobotItem::updatelocalPath(QPolygonF points){
+    m_localpathpoints = points;
+    update();
+}
+
+void RobotItem::updateglobalPath(QPolygonF points){
+    m_globalpathpoints = points;
+    update();
 }
 
 void RobotItem::updatelasetScan(QPolygonF points){

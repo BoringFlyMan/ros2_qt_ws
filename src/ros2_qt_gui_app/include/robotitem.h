@@ -34,6 +34,8 @@ public slots:
     void updaterobotPose(robotPose robotpose);
     void updatelasetScan(QPolygonF points);
     void updatelaserColor(QColor color);
+    void updateglobalPath(QPolygonF points);
+    void updatelocalPath(QPolygonF points);
 
 
 private:
@@ -50,6 +52,8 @@ private:
     robotPose m_currpose;
     QPixmap m_robotImg;
     QPolygonF m_laserscanpoints;
+    QPolygonF m_globalpathpoints;
+    QPolygonF m_localpathpoints;
 
     double m_scaleValue = 1;
 
@@ -65,6 +69,8 @@ private:
     void drawglobalMaps(QPainter *painter);
     void drawrobotPose(QPainter *painter);
     void drawlaserScan(QPainter *painter);
+    void drawglobalPath(QPainter *painter);
+    void drawlocalPath(QPainter *painter);
 };
 
 #endif // ROBOTITEM_H

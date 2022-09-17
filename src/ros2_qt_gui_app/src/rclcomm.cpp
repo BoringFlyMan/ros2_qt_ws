@@ -24,10 +24,10 @@ rclcomm::rclcomm()
     _map_local_sub = node->create_subscription<nav_msgs::msg::OccupancyGrid>("local_costmap/costmap",rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(), std::bind(&rclcomm::map_local_callback, this, std::placeholders::_1),sub_other_obt);
     _map_global_sub = node->create_subscription<nav_msgs::msg::OccupancyGrid>("global_costmap/costmap",rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(), std::bind(&rclcomm::map_global_callback, this, std::placeholders::_1),sub_other_obt);
     _laser_sub = node->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&rclcomm::laser_callback, this, std::placeholders::_1),sub_laser_obt);
-
+    _globalpath_sub = node->create_subscription<nav_msgs::msg::Path>("/plan", 10, std::bind(&rclcomm::globalpath_callback, this, std::placeholders::_1),sub_other_obt);
+    _localpath_sub = node->create_subscription<nav_msgs::msg::Path>("/local_plan", 10, std::bind(&rclcomm::localpath_callback, this, std::placeholders::_1),sub_other_obt);
     m_tf_buffer = std::make_unique<tf2_ros::Buffer>(node->get_clock());
     m_transform_listener = std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
-
 }
 
 void rclcomm::run(){
@@ -103,6 +103,39 @@ QImage rclcomm::rotateMaoWithY(QImage map){
     return res;
 }
 
+void rclcomm::localpath_callback(const nav_msgs::msg::Path::SharedPtr msg){
+    try {
+        geometry_msgs::msg::PointStamped point_map_frame;
+        geometry_msgs::msg::PointStamped point_odom_frame;
+
+        QPolygonF points;
+        for(int i = 0; i < msg->poses.size(); i++){
+            point_odom_frame.point.x = msg->poses[i].pose.position.x;
+            point_odom_frame.point.y = msg->poses[i].pose.position.y;
+            point_odom_frame.header.frame_id = msg->header.frame_id;
+            m_tf_buffer->transform(point_odom_frame, point_map_frame, "map");
+            QPointF point;
+            point = transWorldPoint2Scene(QPointF(point_map_frame.point.x, point_map_frame.point.y));
+            points.push_back(point);
+        }
+        emit emituodatelocalPath(points);
+    } catch (tf2::TransformException &ex) {
+        qDebug()<<"local_plan transform error"<<ex.what();
+    }
+}
+
+//plan global_path
+void rclcomm::globalpath_callback(const nav_msgs::msg::Path::SharedPtr msg){
+    QPolygonF points;
+    for(int i = 0; i < msg->poses.size(); i++){
+        QPointF point;
+        point.setX(msg->poses[i].pose.position.x);
+        point.setY(msg->poses[i].pose.position.y);
+        point = transWorldPoint2Scene(point);
+        points.push_back(point);
+    }
+    emit emituodateglobalPath(points);
+}
 
 //GlobalMap 
 void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg)

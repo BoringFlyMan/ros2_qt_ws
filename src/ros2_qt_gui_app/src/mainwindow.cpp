@@ -34,10 +34,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(commNode, SIGNAL(emitupdateglobalMap(QImage)), m_robotitem, SLOT(updateglobalMap(QImage)));
     connect(commNode, SIGNAL(emitupdaterobotPose(robotPose)), m_robotitem, SLOT(updaterobotPose(robotPose)));
     connect(commNode, SIGNAL(emitupdatelaserPoints(QPolygonF)), m_robotitem, SLOT(updatelasetScan(QPolygonF)));
-    //m_robotimg
+    connect(commNode, SIGNAL(emituodateglobalPath(QPolygonF)), m_robotitem, SLOT(updateglobalPath(QPolygonF)));
+    connect(commNode, SIGNAL(emituodatelocalPath(QPolygonF)), m_robotitem, SLOT(updatelocalPath(QPolygonF)));
+
+    //m_robotimg这里对于机器人位姿的处理先转换到mianwindow下，然后图片与整个robotimg坐标同步移动，让robotimg下的图片获取旋转角度单独转动。
     connect(commNode, SIGNAL(emitupdaterobotPose(robotPose)), this, SLOT(updaterobotImgPose(robotPose)));
-
-
 
     commNode->start();
 }

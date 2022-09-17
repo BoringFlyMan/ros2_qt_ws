@@ -17,6 +17,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include "nav_msgs/msg/path.hpp"
 
 #include "RobotAlgorithm.h"
 
@@ -39,10 +40,14 @@ private:
     rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr _map_local_sub;
     rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr _map_global_sub;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr _laser_sub;
+    rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _globalpath_sub;
+    rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _localpath_sub;
+
 
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_transform_listener;
 //    rclcpp::executors::SingleThreadedExecutor::SharedPtr m_executor;
+    //多线程的回调函数的处理
     rclcpp::executors::MultiThreadedExecutor *m_executor;
     rclcpp::CallbackGroup::SharedPtr callback_group_laser;
     rclcpp::CallbackGroup::SharedPtr callback_group_other;
@@ -55,6 +60,8 @@ private:
     void map_local_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
     void map_global_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
     void laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
+    void globalpath_callback(const nav_msgs::msg::Path::SharedPtr msg);
+    void localpath_callback(const nav_msgs::msg::Path::SharedPtr msg);
 
     QImage rotateMaoWithY(QImage map);
     QPointF m_worldOrigin;
@@ -71,6 +78,8 @@ signals:
     void emitupdateglobalMap(QImage img);
     void emitupdaterobotPose(robotPose pose);
     void emitupdatelaserPoints(QPolygonF points);
+    void emituodateglobalPath(QPolygonF points);
+    void emituodatelocalPath(QPolygonF points);
 };
 
 #endif // RCLCOMM_H

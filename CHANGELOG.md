@@ -1,5 +1,7 @@
+V1.0.6
+	add initialPose add navGoal. topic:/goal_pose /initialpose
 V1.0.5
-	add global and local path. topic:/plan, /local_plan
+	add global and local path. topic:/plan /local_plan
 V1.0.4
 	add laser_scan points. topic:/sacn
 V1.0.3
